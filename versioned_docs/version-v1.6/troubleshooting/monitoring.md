@@ -790,3 +790,35 @@ The workaround involves ensuring that the `rancher-monitoring-operator` ServiceA
 ### Related Issue
 
 [#9674](https://github.com/harvester/harvester/issues/9674)
+
+## The embedded grafana does not provid correct URL path for invite
+
+### Issue Description
+
+1. Be on Harvester Dashboard
+1. Click call-to-action/button to take us to Grafana landing page (rancher-monitoring)
+1. Login
+1. Click the gear-icon/button -> configuration -> then select 'users' tab (x-ref screengrab)
+1. Build a new user, no email
+1. Click the copy invite
+1. Notice that when pasted in the browser it is directing somewhere in-accessible by the user, for example: `http://localhost:3000/invite/3qq7sUO9n7MF3XfRH8YfDWR94pYhli`
+
+### Root Cause
+
+The `grafana` depolyment on Harvester is sitting behind the ingress controller. A prefix is appended to the URL automatically when user visits the grafana per guided steps from Harvester UI.
+
+However, the generated invite link is not sent to external directly, it is still a localhost based link and can't be accessed from external.
+
+### Workaround
+
+Manually append the prefix like `https://10.115.16.193/api/v1/namespaces/cattle-monitoring-system/services/http:rancher-monitoring-grafana:80/proxy/` to the invite link and remove the `http://localhost:3000`. The final link is `https://10.115.16.193/api/v1/namespaces/cattle-monitoring-system/services/http:rancher-monitoring-grafana:80/proxy/invite/smVzjAUMSx0WKfl0giG1w0zEQ0d6ID`
+
+:::note
+
+This workaround also applies to other `grafana` local link, the link can be accessed from external after patching the prefix.
+
+:::
+
+### Related Issue
+
+[#5298](https://github.com/harvester/harvester/issues/5298)
