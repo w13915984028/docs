@@ -233,11 +233,22 @@ This workaround is only necessary when upgrading to v1.7.0. In v1.7.1 and later 
 
 Related issues: [#9815](https://github.com/harvester/harvester/issues/9815) and [#9802](https://github.com/harvester/harvester/issues/9802)
 
-### 4. After upgrade from to v1.7.x, Running VM show message "Restart action is required ..."
+### 4. After upgrade the running VMs show message "Restart action is required ..."
 
-After upgrade, the Harvester UI might show message like `"Restart action is required ..."`, Kubevirt adds a field to the vm definition implicitly during the upgrade.
+After the upgrade, the Harvester UI may show the message `"Restart action is required ..."` for running virtual machines. This occurs because KubeVirt adds the following field to the virtual machine definition during the upgrade.
 
-Check the yaml output of the related VM, it shows information like below.
+```yaml
+spec:
+  template:
+    spec:
+      domain:
+          firmware:
+            uuid: <VALUE>
+```
+
+Check if the YAML definition of the affected virtual machines includes this field.
+
+Example:
 
   ```yaml
   metadata:
@@ -279,6 +290,6 @@ Check the yaml output of the related VM, it shows information like below.
       type: RestartRequired
    ```
 
-Restart the VM on a proper time to eliminate this warning message.
+To clear the message, restart the affected virtual machines at your next scheduled maintenance window.
 
-Related issues: [#9751](https://github.com/harvester/harvester/issues/9751)
+Related issue: [#9751](https://github.com/harvester/harvester/issues/9751)
