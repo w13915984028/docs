@@ -815,7 +815,9 @@ Manually append the prefix like `https://10.115.16.193/api/v1/namespaces/cattle-
 
 :::note
 
-This workaround also applies to other `grafana` local link, the link can be accessed from external after patching the prefix.
+1. This workaround also applies to other `grafana` local link, the link can be accessed from external after patching the prefix.
+
+1. When the Harvester cluster is imported to `Rancher Manager`, recommend to use [Role-based Access Control](https://ranchermanager.docs.rancher.com/integrations-in-rancher/monitoring-and-alerting/rbac-for-monitoring) and disable the `grafana` password login.
 
 :::
 
