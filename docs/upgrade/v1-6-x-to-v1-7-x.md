@@ -232,3 +232,64 @@ This workaround is only necessary when upgrading to v1.7.0. In v1.7.1 and later 
 :::
 
 Related issues: [#9815](https://github.com/harvester/harvester/issues/9815) and [#9802](https://github.com/harvester/harvester/issues/9802)
+
+### 4. After upgrade the running VMs show message "Restart action is required ..."
+
+After the upgrade, the Harvester UI may show the message `"Restart action is required ..."` for running virtual machines. This occurs because KubeVirt adds the following field to the virtual machine definition during the upgrade.
+
+```yaml
+spec:
+  template:
+    spec:
+      domain:
+          firmware:
+            uuid: <VALUE>
+```
+
+Check if the YAML definition of the affected virtual machines includes this field.
+
+Example:
+
+  ```yaml
+  metadata:
+  ...
+    managedFields:
+    - apiVersion: kubevirt.io/v1
+      fieldsType: FieldsV1
+      fieldsV1:
+        f:metadata:
+          f:annotations:
+            f:kubevirt.io/latest-observed-api-version: {}
+            f:kubevirt.io/storage-observed-api-version: {}
+          f:finalizers:
+            v:"kubevirt.io/virtualMachineControllerFinalize"null: {}
+        f:spec:
+          f:template:
+            f:spec:
+              f:domain:
+                f:firmware:
+                  .: {}
+                  f:uuid: {}
+      manager: virt-controller
+      operation: Update
+      time: "2025-12-15T09:10:30Z"
+  ...
+  spec:
+    template:
+      spec:
+        domain:
+          firmware:
+            uuid: d633a622-2335-5606-93ae-d432b7c7f2d2
+  ...
+  status:
+    conditions:
+    - lastProbeTime: "null"
+      lastTransitionTime: "2025-12-15T09:10:30Z"
+      message: a non-live-updatable field was changed in the template spec
+      status: "True"
+      type: RestartRequired
+   ```
+
+To clear the message, restart the affected virtual machines at your next scheduled maintenance window.
+
+Related issue: [#9751](https://github.com/harvester/harvester/issues/9751)
